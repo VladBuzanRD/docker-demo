@@ -1,0 +1,41 @@
+version: '3.4'
+
+networks:
+  web-app:
+    driver: bridge
+
+services:
+  backend-service:
+    image: backend-image
+    build:
+      context: ./DemoDockerBack
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - web-app
+    depends_on:
+      - ms-sql-server-service
+  frontend-service:
+    image: frontend-image
+    build:
+      context: ./docker-frontend
+      dockerfile: Dockerfile
+    networks:
+      - web-app
+    ports:
+      - "3000:3000"
+      
+  ms-sql-server-service:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    volumes:
+      - ms-sql-volume:/var/opt/mssql
+    networks:
+      - web-app
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Password1234!"
+volumes:
+  ms-sql-volume:
